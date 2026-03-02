@@ -1,7 +1,6 @@
 package org.delcom.pam_p4_ifs23021.helper
 
 class ConstHelper {
-    // Route Names
     enum class RouteNames(val path: String) {
         Home(path = "home"),
         Profile(path = "profile"),
@@ -12,7 +11,7 @@ class ConstHelper {
         PlantsDetail(path = "plants/{plantId}"),
         PlantsEdit(path = "plants/{plantId}/edit"),
 
-        // ===== Wisata Samosir (baru) =====
+        // ===== Wisata Samosir =====
         Destinations(path = "destinations"),
         DestinationsAdd(path = "destinations/add"),
         DestinationsDetail(path = "destinations/{destinationId}"),

@@ -8,8 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.delcom.pam_p4_ifs23021.helper.ConstHelper
 import org.delcom.pam_p4_ifs23021.ui.screens.*
-import org.delcom.pam_p4_ifs23021.ui.viewmodels.PlantViewModel
 import org.delcom.pam_p4_ifs23021.ui.viewmodels.DestinationViewModel
+import org.delcom.pam_p4_ifs23021.ui.viewmodels.PlantViewModel
 
 @Composable
 fun UIApp(
@@ -22,22 +22,23 @@ fun UIApp(
         navController = navController,
         startDestination = ConstHelper.RouteNames.Home.path
     ) {
+        // Home
         composable(ConstHelper.RouteNames.Home.path) {
             HomeScreen(navController = navController)
         }
 
+        // Profile
         composable(ConstHelper.RouteNames.Profile.path) {
             ProfileScreen(navController = navController, plantViewModel = plantViewModel)
         }
 
+        // ===== Plants =====
         composable(ConstHelper.RouteNames.Plants.path) {
             PlantsScreen(navController = navController, plantViewModel = plantViewModel)
         }
-
         composable(ConstHelper.RouteNames.PlantsAdd.path) {
             PlantsAddScreen(navController = navController, plantViewModel = plantViewModel)
         }
-
         composable(
             route = ConstHelper.RouteNames.PlantsDetail.path,
             arguments = listOf(navArgument("plantId") { type = NavType.StringType })
@@ -49,7 +50,6 @@ fun UIApp(
                 plantId = plantId
             )
         }
-
         composable(
             route = ConstHelper.RouteNames.PlantsEdit.path,
             arguments = listOf(navArgument("plantId") { type = NavType.StringType })
@@ -62,23 +62,19 @@ fun UIApp(
             )
         }
 
-        // ==========================
-        // ✅ WISATA SAMOSIR (BARU)
-        // ==========================
+        // ===== Wisata Samosir =====
         composable(ConstHelper.RouteNames.Destinations.path) {
             DestinationsScreen(
                 navController = navController,
                 destinationViewModel = destinationViewModel
             )
         }
-
         composable(ConstHelper.RouteNames.DestinationsAdd.path) {
             DestinationAddScreen(
                 navController = navController,
                 destinationViewModel = destinationViewModel
             )
         }
-
         composable(
             route = ConstHelper.RouteNames.DestinationsDetail.path,
             arguments = listOf(navArgument("destinationId") { type = NavType.StringType })
@@ -90,7 +86,6 @@ fun UIApp(
                 destinationViewModel = destinationViewModel
             )
         }
-
         composable(
             route = ConstHelper.RouteNames.DestinationsEdit.path,
             arguments = listOf(navArgument("destinationId") { type = NavType.StringType })

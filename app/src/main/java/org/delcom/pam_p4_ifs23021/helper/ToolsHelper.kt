@@ -11,11 +11,18 @@ import org.delcom.pam_p4_ifs23021.BuildConfig
 import java.io.File
 
 object ToolsHelper {
-    fun getPlantImageUrl(plantId: String): String{
+
+    private const val BASE_URL = "https://pam-2026-p4-ifs23021-be.marshalll.fun:8080/"
+
+    fun getPlantImageUrl(plantId: String): String {
         return "${BuildConfig.BASE_URL_PANTS_API}plants/${plantId}/image"
     }
 
-    fun getProfilePhotoUrl(): String{
+    fun getDestinationImageUrl(destinationId: String): String {
+        return "${BASE_URL}destinations/${destinationId}/image"
+    }
+
+    fun getProfilePhotoUrl(): String {
         return "${BuildConfig.BASE_URL_PANTS_API}profile/photo"
     }
 
@@ -29,26 +36,17 @@ object ToolsHelper {
         partName: String
     ): MultipartBody.Part {
         val file = uriToFile(context, uri)
-
-        val requestFile = file
-            .asRequestBody("image/*".toMediaTypeOrNull())
-
-        return MultipartBody.Part.createFormData(
-            partName,
-            file.name,
-            requestFile
-        )
+        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData(partName, file.name, requestFile)
     }
 
     fun uriToFile(context: Context, uri: Uri): File {
         val file = File.createTempFile("upload", ".tmp", context.cacheDir)
-
         context.contentResolver.openInputStream(uri)?.use { input ->
             file.outputStream().use { output ->
                 input.copyTo(output)
             }
         }
-
         return file
     }
 }
