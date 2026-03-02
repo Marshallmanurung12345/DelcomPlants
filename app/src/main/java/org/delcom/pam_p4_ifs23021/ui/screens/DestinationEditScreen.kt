@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -41,6 +40,7 @@ import org.delcom.pam_p4_ifs23021.ui.viewmodels.DestinationActionUIState
 import org.delcom.pam_p4_ifs23021.ui.viewmodels.DestinationUIState
 import org.delcom.pam_p4_ifs23021.ui.viewmodels.DestinationViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DestinationEditScreen(
     navController: NavHostController,
@@ -54,7 +54,8 @@ fun DestinationEditScreen(
 
     LaunchedEffect(Unit) {
         isLoading = true
-        uiState.destinationAction = DestinationActionUIState.Loading
+        // Perbaikan: Tidak mengubah properti internal uiState secara langsung,
+        // tapi biarkan ViewModel yang mengelolanya melalui pemanggilan fungsi.
         destinationViewModel.getDestinationById(destinationId)
     }
 
@@ -63,7 +64,8 @@ fun DestinationEditScreen(
             if (uiState.destination is DestinationUIState.Success) {
                 destination = (uiState.destination as DestinationUIState.Success).data
                 isLoading = false
-            } else {
+            } else if (uiState.destination is DestinationUIState.Error) {
+                isLoading = false
                 RouteHelper.back(navController)
             }
         }
@@ -91,7 +93,7 @@ fun DestinationEditScreen(
         }
     }
 
-    if (isLoading || destination == null) {
+    if (isLoading || (destination == null && uiState.destination is DestinationUIState.Loading)) {
         LoadingUI()
         return
     }
@@ -109,32 +111,35 @@ fun DestinationEditScreen(
                 showBackButton = true
             )
             Box(modifier = Modifier.weight(1f)) {
-                DestinationEditUI(
-                    destination = destination!!,
-                    onSave = { nama, slug, kategori, deskripsi, lokasi, hargaTiket, jamBuka, kontak, fileUri ->
-                        isLoading = true
-                        val context = navController.context
-                        val filePart = fileUri?.let { uriToMultipart(context, it, "file") }
-                        destinationViewModel.putDestination(
-                            id = destinationId,
-                            nama = nama.toRequestBodyText(),
-                            slug = slug.toRequestBodyText(),
-                            kategori = kategori.toRequestBodyText(),
-                            deskripsi = deskripsi.toRequestBodyText(),
-                            lokasi = lokasi.toRequestBodyText(),
-                            hargaTiket = hargaTiket.toRequestBodyText(),
-                            jamBuka = jamBuka.toRequestBodyText(),
-                            kontak = kontak.toRequestBodyText(),
-                            file = filePart
-                        )
-                    }
-                )
+                if (destination != null) {
+                    DestinationEditUI(
+                        destination = destination!!,
+                        onSave = { nama, slug, kategori, deskripsi, lokasi, hargaTiket, jamBuka, kontak, fileUri ->
+                            isLoading = true
+                            val context = navController.context
+                            val filePart = fileUri?.let { uriToMultipart(context, it, "file") }
+                            destinationViewModel.putDestination(
+                                id = destinationId,
+                                nama = nama.toRequestBodyText(),
+                                slug = slug.toRequestBodyText(),
+                                kategori = kategori.toRequestBodyText(),
+                                deskripsi = deskripsi.toRequestBodyText(),
+                                lokasi = lokasi.toRequestBodyText(),
+                                hargaTiket = hargaTiket.toRequestBodyText(),
+                                jamBuka = jamBuka.toRequestBodyText(),
+                                kontak = kontak.toRequestBodyText(),
+                                file = filePart
+                            )
+                        }
+                    )
+                }
             }
             BottomNavComponent(navController = navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DestinationEditUI(
     destination: Destination,
@@ -222,7 +227,7 @@ fun DestinationEditUI(
                 readOnly = true,
                 label = { Text("Kategori") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedKategori) },
-                modifier = Modifier.fillMaxWidth().menuAnchor()
+                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
             )
             ExposedDropdownMenu(
                 expanded = expandedKategori,

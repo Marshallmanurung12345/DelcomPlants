@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,6 +40,7 @@ import org.delcom.pam_p4_ifs23021.ui.components.TopAppBarComponent
 import org.delcom.pam_p4_ifs23021.ui.viewmodels.DestinationActionUIState
 import org.delcom.pam_p4_ifs23021.ui.viewmodels.DestinationViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DestinationAddScreen(
     navController: NavHostController,
@@ -51,24 +50,27 @@ fun DestinationAddScreen(
     val uiState by destinationViewModel.uiState.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        uiState.destinationAction = DestinationActionUIState.Loading
-    }
+    // LaunchedEffect(Unit) dihapus agar tidak me-reset state secara tidak sengaja saat komposisi ulang
 
     LaunchedEffect(uiState.destinationAction) {
         when (val state = uiState.destinationAction) {
             is DestinationActionUIState.Success -> {
-                SuspendHelper.showSnackBar(
-                    snackbarHostState, SuspendHelper.SnackBarType.SUCCESS, "Destinasi berhasil ditambahkan!"
-                )
-                RouteHelper.to(navController, ConstHelper.RouteNames.Destinations.path, true)
-                isLoading = false
+                if (isLoading) { // Pastikan hanya bereaksi jika sedang dalam proses loading (simpan)
+                    SuspendHelper.showSnackBar(
+                        snackbarHostState, SuspendHelper.SnackBarType.SUCCESS, "Destinasi berhasil ditambahkan!"
+                    )
+                    isLoading = false
+                    // Navigasi kembali ke daftar destinasi
+                    RouteHelper.to(navController, ConstHelper.RouteNames.Destinations.path, true)
+                }
             }
             is DestinationActionUIState.Error -> {
-                SuspendHelper.showSnackBar(
-                    snackbarHostState, SuspendHelper.SnackBarType.ERROR, state.message
-                )
-                isLoading = false
+                if (isLoading) {
+                    SuspendHelper.showSnackBar(
+                        snackbarHostState, SuspendHelper.SnackBarType.ERROR, state.message
+                    )
+                    isLoading = false
+                }
             }
             else -> {}
         }
@@ -76,7 +78,7 @@ fun DestinationAddScreen(
 
     if (isLoading) {
         LoadingUI()
-        return
+        // Kita tidak mereturn di sini agar Scaffold tetap ada untuk menampilkan SnackBar jika terjadi error
     }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
@@ -116,6 +118,7 @@ fun DestinationAddScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DestinationAddUI(
     onSave: (
@@ -206,7 +209,7 @@ fun DestinationAddUI(
                 readOnly = true,
                 label = { Text("Kategori") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedKategori) },
-                modifier = Modifier.fillMaxWidth().menuAnchor()
+                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
             )
             ExposedDropdownMenu(
                 expanded = expandedKategori,
