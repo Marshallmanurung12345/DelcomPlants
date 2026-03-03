@@ -137,13 +137,13 @@ fun ProfileUI(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = profile.nama,
+                    text = "Marshall Manurung",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = profile.username,
+                    text = "ifs23021",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -169,7 +169,7 @@ fun ProfileUI(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    profile.tentang,
+                    "Saya adalah seorang developer yang tertarik pada mobile development, backend API, dan berbagai teknologi pengembangan aplikasi. Senang belajar hal baru dan membangun aplikasi yang berguna.",
                     fontSize = 15.sp
                 )
             }
@@ -185,9 +185,9 @@ fun PreviewProfileUI(){
     DelcomTheme {
         ProfileUI(
             profile = ResponseProfile(
-                nama = "Abdullah Ubaid",
-                username = "ifs18005",
-                tentang = ""
+                nama = "Marshall Manurung",
+                username = "ifs23021",
+                tentang = "Saya adalah seorang developer yang tertarik pada mobile development, backend API, dan berbagai teknologi pengembangan aplikasi. Senang belajar hal baru dan membangun aplikasi yang berguna."
             )
         )
     }
